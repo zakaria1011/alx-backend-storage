@@ -19,29 +19,18 @@ class Cache:
         return key
 
     def get(self, key: str,
-            fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
-        '''
-            Get data from the cache.
-        '''
+            fn: callable = None) -> Union[str, bytes, int, float, None]:
+        """ get methode"""
         value = self._redis.get(key)
+        if value is None:
+            return None
         if fn:
-            value = fn(value)
-        return value
+            return fn(value)
 
-    def get_str(self, key: str) -> str:
-        '''
-            Get a string from the cache.
-        '''
-        value = self._redis.get(key)
-        return value.decode('utf-8')
+    def get_str(self, key: str) -> Union[str, None]:
+        """ get str"""
+        return self.get(key, fn=lambda d: d.decode("utf-8"))
 
-    def get_int(self, key: str) -> int:
-        '''
-            Get an int from the cache.
-        '''
-        value = self._redis.get(key)
-        try:
-            value = int(value.decode('utf-8'))
-        except Exception:
-            value = 0
-        return value
+    def get_int(self, key: str) -> Union[int, None]:
+        """ get str"""
+        return self.get(key, fn=int)
